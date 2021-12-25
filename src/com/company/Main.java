@@ -19,7 +19,7 @@ public class Main {
             System.out.println(arr[i]);
     }
 
-    static int randomizedPivot(int[] arr, int size){
+    static int randomizedPivotPos(int size){
         Random rd = new Random();
         return abs(rd.nextInt() % size);
     }
@@ -28,6 +28,6 @@ public class Main {
         int size = 10;
         int [] arr = randArray(size);
         //printArrayOfInt(arr, size);
-        System.out.println(randomizedPivot(arr, size));
+        //System.out.println(randomizedPivotPos(size));
     }
 }
