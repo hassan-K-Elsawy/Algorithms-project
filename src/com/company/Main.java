@@ -1,6 +1,7 @@
 package com.company;
 
 
+import java.util.Arrays;
 import java.util.Random;
 import static java.lang.Math.abs;
 
@@ -18,6 +19,12 @@ public class Main {
     static void printArrayOfInt(int[] arr, int size){
         for(int i = 0; i<size ; i++)
             System.out.println(arr[i]);
+    }
+
+    static int medianOfFive(int a, int b, int c, int d, int e){
+        int [] arr = {a, b, c, d, e};
+        Arrays.sort(arr);
+        return arr[2];
     }
 
     static int randomizedPivotPos(int startPos, int lastPos){
@@ -60,6 +67,43 @@ public class Main {
         if (ith < k) return medianValueWithRandPivot(arr, firstPos, r-1, ith);
                 else return medianValueWithRandPivot(arr, r+1, lastPos, ith-k);
     }
+
+    static void swapCol (int [][] arr, int col1, int col2){
+        int temp;
+        for(int i=0; i<5 ; i++)
+        {
+            temp = arr[col1][i];
+            arr[col1][i] = arr[col2][i];
+            arr[col2][i] = temp;
+        }
+    }
+
+    static void medianOfGroups(int [] arrOfMedian, int [][] groups, int size){
+
+    }
+
+    static int medianValueGrouping(int []arr, int size, int ith) {
+        if(size <= 15) { // if array has 15 or less elements sort and return ith
+            Arrays.sort(arr);
+            return arr[ith];
+        }
+        int i;
+        int noOfGroups = size / 5;
+        int[] mediansOfGroups = new int [noOfGroups];
+        int [][] groups = size % 5 == 0 ? new int [noOfGroups][5] : new int [noOfGroups + 1][5] ;
+        for (i = 0; i < size; i++)
+            groups[i/5][i%5] = arr[i];
+
+
+        for(i = 0; i<noOfGroups; i++ ){
+            Arrays.sort(groups[i]);
+            mediansOfGroups [i] = groups[i][2];
+        }
+
+
+
+    }
+
 
 
     public static void main(String[] args) {
