@@ -4,6 +4,7 @@ package com.company;
 import java.util.Arrays;
 import java.util.Random;
 import static java.lang.Math.abs;
+import static java.lang.Math.ceil;
 
 public class Main {
 
@@ -58,6 +59,27 @@ public class Main {
         return pivotPoint;
     }
 
+    static int randPartitionMOM(int [][] arr,int[] medians, int locA, int locB){
+        int i, pivotPoint = locA;
+        int randPos = randomizedPivotPos(locA , locB);
+
+        swapElem(medians, randPos, locB);
+        swapCol(arr, randPos, locB);
+
+        for( i =locA; i < locB; i++){
+            if(medians[i] < medians[locB])
+            {
+                swapElem(medians, i, pivotPoint);
+                swapCol(arr, i, pivotPoint);
+                pivotPoint += 1;
+            }
+        }
+        swapElem(medians, pivotPoint, locB);
+        swapCol(arr, pivotPoint, locB);
+        //printArrayOfInt(arr, locB - locA + 1);
+        return pivotPoint;
+    }
+
     static int medianValueWithRandPivot(int [] arr, int firstPos, int lastPos, int ith) {
         if(firstPos == lastPos)
             return arr[firstPos];
@@ -66,6 +88,16 @@ public class Main {
         if (ith == k) return arr[r];
         if (ith < k) return medianValueWithRandPivot(arr, firstPos, r-1, ith);
                 else return medianValueWithRandPivot(arr, r+1, lastPos, ith-k);
+    }
+
+    static int medianValueWithRandPivotMedianOfMedians(int [][] groups, int [] arr, int firstPos, int lastPos, int ith) {
+        if(firstPos == lastPos)
+            return arr[firstPos];
+        int r = randPartitionMOM(groups, arr, firstPos, lastPos);
+        int k = r - firstPos + 1;
+        if (ith == k) return arr[r];
+        if (ith < k) return medianValueWithRandPivot(arr, firstPos, r-1, ith);
+        else return medianValueWithRandPivot(arr, r+1, lastPos, ith-k);
     }
 
     static void swapCol (int [][] arr, int col1, int col2){
@@ -78,19 +110,18 @@ public class Main {
         }
     }
 
-    static void medianOfGroups(int [] arrOfMedian, int [][] groups, int size){
-
-    }
 
     static int medianValueGrouping(int []arr, int size, int ith) {
-        if(size <= 15) { // if array has 15 or less elements sort and return ith
+        if(size <= 9) { // if array has 15 or less elements sort and return ith
             Arrays.sort(arr);
             return arr[ith];
         }
         int i;
         int noOfGroups = size / 5;
+        int extraElem = size % 5;
+        boolean is5Div = extraElem == 0 ;
         int[] mediansOfGroups = new int [noOfGroups];
-        int [][] groups = size % 5 == 0 ? new int [noOfGroups][5] : new int [noOfGroups + 1][5] ;
+        int [][] groups = is5Div? new int [noOfGroups][5] : new int [noOfGroups + 1][5] ;
         for (i = 0; i < size; i++)
             groups[i/5][i%5] = arr[i];
 
@@ -100,8 +131,79 @@ public class Main {
             mediansOfGroups [i] = groups[i][2];
         }
 
+        int x = medianValueWithRandPivotMedianOfMedians(groups, mediansOfGroups, 0 , noOfGroups-1, noOfGroups/2 );
+        int k = (int) ((5*(ceil(noOfGroups/2)-1)) + 2);
+        int nextPoint = 0;
+        if(ith == k)
+            return x;
+        else {
+            int newSize = (int) ( size - (ceil(noOfGroups/2)) * 3 - 1 + extraElem);
+            int[] newArr = new int [newSize];
+            int itter = (size / 5) * 5;
+            if(!is5Div){
+                for(i=0; i<extraElem ; i++)
+                {
+                    newArr[nextPoint] = groups[noOfGroups][nextPoint];
+                    nextPoint += 1;
+                }
+            }
+            if (ith < k)
+            {
 
+                for(i=0; i < noOfGroups/2; i++)
+                {
+                    newArr[nextPoint] = groups[i][0];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][1];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][2];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][3];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][4];
+                    nextPoint += 1;
 
+                }
+                for(; i < noOfGroups ; i++){
+                    newArr[nextPoint] = groups[i][0];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][1];
+                    nextPoint += 1;
+                }
+                return medianValueGrouping(newArr, nextPoint, ith);
+            }
+            else
+            {
+                /*for(i=0 ; i < itter-(noOfGroups*3); i++) {
+                    if (groups[i/5][i%5] > x) {
+                        newArr[nextPoint] = groups[i/5][i%5];
+                        nextPoint += 1;
+                    }
+                }*/
+                for(i=0; i < ceil(noOfGroups/2); i++)
+                {
+                    newArr[nextPoint] = groups[i][3];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][4];
+                    nextPoint += 1;
+
+                }
+                for(; i < noOfGroups ; i++){
+                    newArr[nextPoint] = groups[i][0];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][1];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][2];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][3];
+                    nextPoint += 1;
+                    newArr[nextPoint] = groups[i][4];
+                    nextPoint += 1;
+                }
+
+                return medianValueGrouping(newArr, nextPoint, ith - k);
+            }
+        }
     }
 
 
@@ -110,6 +212,9 @@ public class Main {
         int size = 10;
         int [] arr = randArray(size);
 
+        int [] arr1 = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+
+        System.out.println(medianValueGrouping(arr1, 20, 20));
 
 
         //printArrayOfInt(arr, size);
