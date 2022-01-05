@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Random;
 import static java.lang.Math.abs;
 import static java.lang.Math.ceil;
+import static java.lang.System.arraycopy;
 
 public class Main {
 
@@ -72,7 +73,8 @@ public class Main {
         swapCol(arr, pivotPoint, locB);
         //printArrayOfInt(arr, locB - locA + 1);
         return pivotPoint;
-    }*/
+    }
+    */
 
     static int medianValueWithRandPivot(int [] arr, int firstPos, int lastPos, int ith) {
         if(firstPos == lastPos)
@@ -93,8 +95,9 @@ public class Main {
         if (ith < k) return medianValueWithRandPivotMedianOfMedians(groups, arr, firstPos, r-1, ith);
         else return medianValueWithRandPivotMedianOfMedians(groups, arr, r+1, lastPos, ith-k);
     }
+    */
 
-    static void swapCol (int [][] arr, int col1, int col2){
+    /*static void swapCol (int [][] arr, int col1, int col2){
         int temp;
         for(int i=0; i<5 ; i++)
         {
@@ -104,13 +107,15 @@ public class Main {
         }
     }
 
-    static int medianValueGrouping(int []arr, int size, int ith) {
+     */
+
+    /*static int medianValueGrouping(int []arr, int size, int ith) {
 
         if(size <= 15) { // if array has 15 or less elements sort and return ith
             Arrays.sort(arr);
             return arr[ith - 1];
         }
-        int i,j;
+        int i;
 
         int noOfGroups = size / 5;
         int extraElem = size % 5;
@@ -206,23 +211,94 @@ public class Main {
                 return medianValueGrouping(sentArr, nextPoint, ith - (size - nextPoint));
             }
         }
-    }*/
+    }
+    */
+
+    static void sortgroup(int [] arr, int ithGroup){
+        int startPos = ithGroup*5;
+        int [] temp = new int [5];
+
+        //for(int i =0; i<5 ; i++)
+        //    temp[i] = arr[startPos+i];
+
+        arraycopy(arr,startPos,temp,0,5);
+        Arrays.sort(temp);
+        arraycopy(temp,0,arr,startPos,5);
+        //for(int i =0; i<5 ; i++)
+        //    arr[startPos+i] = temp[i];
+    }
+
+    static int getMOM(int[] arr, int size){
+
+        int i;
+
+        int noOfGroups = size / 5;
+        int [] medians = new int [noOfGroups];
+        int midMedian = (int) ceil(noOfGroups/2.0);
+
+        for(i=0; i<noOfGroups; i++)
+        {
+            sortgroup(arr, i);
+            medians[i] = arr[(i*5)+2];
+        }
+
+        return medianValueWithRandPivot(medians, 0, noOfGroups-1, midMedian);
+    }
+
+    static int partition(int [] arr, int size, int x){
+        int i,pivotPoint=0;
+        for(i=0; i<size; i++) {
+            if (x == arr[i]) {
+                swapElem(arr, i, size - 1);
+                break;
+            }
+        }
+
+        for( i =0; i < size-1; i++){
+            if(arr[i] < arr[size-1])
+            {
+                swapElem(arr, i, pivotPoint);
+                pivotPoint += 1;
+            }
+        }
+        swapElem(arr, pivotPoint, size-1);
+        //printArrayOfInt(arr, locB - locA + 1);
+        return pivotPoint;
+    }
+
+    static int medianValueWithMOM(int[] arr, int size, int ith){
+
+        if(size <= 15){
+            Arrays.sort(arr);
+            return arr[ith-1];
+        }
+
+        int x = getMOM(arr, size);
+        int r = partition(arr, size, x);
+        int k = r + 1;
+        if (ith == k) return arr[r];
+        int [] newArr ;
+        if (ith < k) {
+            newArr = new int [r];
+            arraycopy(arr,0, newArr, 0, r);
+            return medianValueWithMOM(newArr, r, ith);
+        }
+        else {
+            newArr = new int [size-r-1];
+            arraycopy(arr,r+1,newArr,0,size-r-1);
+            return medianValueWithMOM(newArr, size-r-1, ith - k);
+        }
+    }
 
     public static void main(String[] args) {
-        int size = 10;
-        int [] arr = randArray(size);
+        //int size = 10;
+        //int [] arr = randArray(size);
         //int [] arr1 = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40};
-        int [] arr1 = {24,35,1,2,36,37,38,39,40,15,16,17,18,19,20,25,26,23,12,34,30,27,28,29,7,8,9,10,11,13,14,3,4,5,6,21,22,31,32,33};
+        int [] arr1 = {24,35,1,2,36,17,26,23,12,34,30,27,11,13,14,3,18,19,20,28,29,7,8,9,10,25,4,5,6,21,22,37,38,39,40,15,16,31,32,33};
 
-        //for (int i = 0; i< 40; i++) {
-        //    int temp = medianValueGrouping(arr1, 40, i+1);
-        //    System.out.println(temp);
-        //}
-
-        //int temp = medianValueGrouping(arr1, 40, 20);
-        //System.out.println(temp);
-
-        //printArrayOfInt(arr, size);
-
+        for (int i = 0; i< 40; i++) {
+            int temp = medianValueWithMOM(arr1, 40, i+1);
+            System.out.println(temp);
+        }
     }
 }
