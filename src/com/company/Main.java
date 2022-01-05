@@ -1,7 +1,9 @@
 package com.company;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import static java.lang.Math.abs;
 import static java.lang.Math.ceil;
@@ -286,13 +288,18 @@ public class Main {
     }
 
     */
+
     public static void main(String[] args) {
-        int size =  210000000;
+        int size =  10000000;
         int [] arr = randArray(size);
-        int [] arrClone1 , arrClone2, arrClone3;
+        int [] arrClone1;
+        int [] arrClone1_1;
+        int [] arrClone2;
+        int [] arrClone3;
         long startTime, MOMElapsed, RandElapsed, classicElapsed;
 
         arrClone1 = arr.clone();
+        arrClone1_1 = arr.clone();
         arrClone2 = arr.clone();
         arrClone3 = arr.clone();
 
@@ -303,6 +310,16 @@ public class Main {
         //    int temp = medianValueWithMOM(arr1, 40, i+1);
         //    System.out.println(temp);
         //}
+        externalMOM extMOM = new externalMOM();
+
+        ArrayList<Integer> arrList = new ArrayList<>();
+        for(int num:arrClone1_1)
+            arrList.add(num);
+
+        startTime = nanoTime();
+        System.out.println(extMOM.getMedian(arrList));
+        MOMElapsed = nanoTime() - startTime;
+        System.out.println("elapsed time for median of medians external implementation " +  MOMElapsed/1000000);
 
         startTime = nanoTime();
         System.out.println(medianValueWithMOM(arrClone1, size, (size/2)+1));
